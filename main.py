@@ -198,6 +198,7 @@ for item in urls:
             "Expected Value": f"${expected_value:.2f}",
             "ROI Percentage": roi,
             "Total Prize Pool Remaining": f"${current_df['Remaining Prize Amount'].sum():,.2f}",
+            "Current Tickets / Original Tickets": current_tickets / original_tickets
         }
 
         games_data.append(game_data)
