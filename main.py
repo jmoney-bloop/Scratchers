@@ -5,15 +5,11 @@ import pandas as pd
 
 def format_currency(value):
     """Format a number as currency with commas and dollar sign"""
-    if pd.isna(value):
-        return "N/A"
     return f"${value:,.2f}"
 
 
 def format_large_number(value):
     """Format large numbers with commas"""
-    if pd.isna(value):
-        return "N/A"
     return f"{value:,.0f}"
 
 
@@ -118,11 +114,7 @@ for item in urls:
         launch_df = data[0]
         current_df = data[1]
 
-        # Debug: Print column names to understand structure
-        print(f"Processing {name}")
-        print(f"Launch DF columns: {launch_df.columns.tolist()}")
-        print(f"Current DF columns: {current_df.columns.tolist()}")
-        print(f"Current DF shape: {current_df.shape}")
+
 
         # Extract basic info with better error handling
         try:
@@ -194,7 +186,7 @@ for item in urls:
             ev_breakdown, ev_check = calculate_ev_details(current_df, current_tickets, ticket_price_num)
 
             print(f"Expected Value: {expected_value}")
-            print(f"EV Check (should match): {ev_check}")
+
 
             # Calculate additional metrics
             current_df['Money Back'] = current_df['Prize Value'] >= ticket_price_num
@@ -256,23 +248,9 @@ df_csv = df_sorted.drop('EV Breakdown', axis=1, errors='ignore')
 df_csv.to_csv("Lottodata.csv", index=False)
 
 # Display top games with formatting
-print("Top 10 Games by Expected Value:")
-display_columns = ['Name', 'Ticket Price (Formatted)', 'Expected Value (Formatted)', 'ROI (Formatted)']
-print(df_display[display_columns].head(10).to_string(index=False))
 
-# Display games with positive expected value
-positive_ev = df_sorted[df_sorted['Expected Value'] > 0]
-if not positive_ev.empty:
-    print(f"\n🎉 Games with Positive Expected Value ({len(positive_ev)} found):")
-    positive_display = positive_ev.copy()
-    for col in currency_columns:
-        if col in positive_display.columns:
-            positive_display[f'{col} (Formatted)'] = positive_display[col].apply(format_currency)
-    positive_display['ROI (Formatted)'] = positive_display['ROI Percentage'].apply(
-        lambda x: f"{x:.2f}%" if pd.notna(x) else "N/A")
-    print(positive_display[display_columns].to_string(index=False))
-else:
-    print("\n❌ No games with positive expected value found.")
+display_columns = ['Name', 'Ticket Price (Formatted)', 'Expected Value (Formatted)', 'ROI (Formatted)']
+
 
 # Summary statistics
 print(f"\n📊 Summary Statistics:")
