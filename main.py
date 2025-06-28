@@ -190,11 +190,11 @@ for item in urls:
 
         game_data = {
             "Name": name,
-            "Ticket Price": f"${ticket_price_num}",
+            "Ticket Price": f"${int(ticket_price_num)}",
             "Top Prize": top_prize,
             "Odds": odds,
-            "Original Tickets": f"{original_tickets:,}",
-            "Current Tickets": f"{current_tickets:,}",
+            "Original Tickets": f"{original_tickets:,.2f}",
+            "Current Tickets": f"{current_tickets:,.2f}",
             "Expected Value": f"${expected_value:.2f}",
             "ROI Percentage": roi,
             "Total Prize Pool Remaining": f"${current_df['Remaining Prize Amount'].sum():,.2f}",
