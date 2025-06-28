@@ -2,17 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-
-def format_currency(value):
-    """Format a number as currency with commas and dollar sign"""
-    return f"${value:,.2f}"
-
-
-def format_large_number(value):
-    """Format large numbers with commas"""
-    return f"{value:,.0f}"
-
-
 def all_urls():
     start_url = 'https://www.mslottery.com/gamestatus/active/'
     headers = {
@@ -201,16 +190,14 @@ for item in urls:
 
         game_data = {
             "Name": name,
-            "Ticket Price": ticket_price_num,
+            "Ticket Price": f"${ticket_price_num}",
             "Top Prize": top_prize,
             "Odds": odds,
-            "Original Tickets": original_tickets,
-            "Current Tickets": current_tickets,
-            "Expected Value": expected_value,
+            "Original Tickets": f"{original_tickets:,}",
+            "Current Tickets": f"{current_tickets:,}",
+            "Expected Value": f"${expected_value:.2f}",
             "ROI Percentage": roi,
-            "Money Back Prizes Remaining": money_back_prizes,
-            "Total Prize Pool Remaining": current_df['Remaining Prize Amount'].sum(),
-            "EV Breakdown": ev_breakdown  # Store detailed breakdown
+            "Total Prize Pool Remaining": f"${current_df['Remaining Prize Amount'].sum():,.2f}",
         }
 
         games_data.append(game_data)
@@ -223,40 +210,6 @@ for item in urls:
 df = pd.DataFrame(games_data)
 
 # Sort by expected value (best games first)
-df_sorted = df.sort_values('Expected Value', ascending=False)
+df = df.sort_values('ROI Percentage', ascending=False)
 
-# Create a formatted version for display
-df_display = df_sorted.copy()
-
-# Format currency columns
-currency_columns = ['Ticket Price', 'Expected Value', 'Total Prize Pool Remaining']
-for col in currency_columns:
-    if col in df_display.columns:
-        df_display[f'{col} (Formatted)'] = df_display[col].apply(format_currency)
-
-# Format large number columns
-df_display['Original Tickets (Formatted)'] = df_display['Original Tickets'].apply(format_large_number)
-df_display['Current Tickets (Formatted)'] = df_display['Current Tickets'].apply(format_large_number)
-df_display['Money Back Prizes Remaining (Formatted)'] = df_display['Money Back Prizes Remaining'].apply(
-    format_large_number)
-
-# Format ROI as percentage
-df_display['ROI (Formatted)'] = df_display['ROI Percentage'].apply(lambda x: f"{x:.2f}%" if pd.notna(x) else "N/A")
-
-# Save to CSV (original unformatted data)
-df_csv = df_sorted.drop('EV Breakdown', axis=1, errors='ignore')
-df_csv.to_csv("Lottodata.csv", index=False)
-
-# Display top games with formatting
-
-display_columns = ['Name', 'Ticket Price (Formatted)', 'Expected Value (Formatted)', 'ROI (Formatted)']
-
-
-# Summary statistics
-print(f"\n📊 Summary Statistics:")
-print(f"Total games analyzed: {len(df_sorted)}")
-print(f"Best Expected Value: {format_currency(df_sorted['Expected Value'].max())}")
-print(f"Worst Expected Value: {format_currency(df_sorted['Expected Value'].min())}")
-print(f"Average Expected Value: {format_currency(df_sorted['Expected Value'].mean())}")
-print(f"Best ROI: {df_sorted['ROI Percentage'].max():.2f}%")
-print(f"Average ROI: {df_sorted['ROI Percentage'].mean():.2f}%")
+df.to_csv("Lottodata.csv", index=False)
